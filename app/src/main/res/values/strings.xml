@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">SaudeAI</string>
+    <string name="digite_sua_mensagem">Digite sua mensagem</string>
+    <string name="enviar">Enviar</string>
+    <string name="voce">Você:</string>
+    <string name="logo_desc">Logo do SaudeAI</string>
+</resources>
