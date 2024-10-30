@@ -55,6 +55,8 @@
         app:layout_constraintTop_toBottomOf="@id/toolbar">
 
         <!-- Fundo cinza claro do RecyclerView -->
+
+        <!-- Marca d'água -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewChat"
             android:layout_width="match_parent"
@@ -63,7 +65,6 @@
             android:padding="8dp"
             android:scrollbars="vertical" />
 
-        <!-- Marca d'água -->
         <ImageView
             android:id="@+id/backgroundWatermark"
             android:layout_width="300dp"
@@ -80,20 +81,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="8dp"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:layout_editor_absoluteX="0dp">
 
         <TextView
             android:id="@+id/textViewTimer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Gravando áudio... 0s"
-            android:textSize="24sp"
             android:textColor="#000000"
+            android:textSize="24sp"
             android:visibility="gone"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/buttonAudio"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintEnd_toStartOf="@id/buttonAudio"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Campo de texto para digitar a mensagem -->
         <EditText
@@ -103,32 +105,39 @@
             android:layout_marginEnd="8dp"
             android:hint="@string/digite_sua_mensagem"
             android:textSize="20sp"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/buttonAudio"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Botão de áudio -->
         <ImageButton
             android:id="@+id/buttonAudio"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/baseline_mic_none_24"
+            android:layout_width="34dp"
+            android:layout_height="38dp"
+            android:background="@null"
             android:contentDescription="Gravar Áudio"
-            app:layout_constraintEnd_toStartOf="@id/buttonSend"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
-
-        <!-- Botão para enviar a mensagem -->
-        <Button
-            android:id="@+id/buttonSend"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/enviar"
-            android:textSize="20sp"
+            android:scaleType="fitXY"
+            android:src="@drawable/baseline_mic_24"
+            android:layout_marginEnd="15dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintEnd_toStartOf="@id/buttonSend"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/buttonSend"
+            android:layout_width="35dp"
+            android:layout_height="38dp"
+            android:background="@null"
+            android:contentDescription="Enviar"
+            android:scaleType="fitXY"
+            android:src="@drawable/baseline_send_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

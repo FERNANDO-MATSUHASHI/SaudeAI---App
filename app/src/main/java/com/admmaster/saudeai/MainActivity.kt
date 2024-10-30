@@ -11,8 +11,11 @@ import android.os.Looper
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
+import android.text.Editable
+import android.text.TextWatcher
 import android.text.TextUtils
 import android.view.MotionEvent
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -53,6 +56,26 @@ class MainActivity : AppCompatActivity() {
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = chatAdapter
         }
+
+        // Inicializa o layout com apenas o botão de áudio visível
+        binding.buttonSend.visibility = View.GONE
+        binding.buttonAudio.visibility = View.VISIBLE
+
+        // Observa alterações no campo de entrada de mensagem
+        binding.editTextMessage.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                if (s.isNullOrEmpty()) {
+                    binding.buttonSend.visibility = View.GONE
+                    binding.buttonAudio.visibility = View.VISIBLE
+                } else {
+                    binding.buttonSend.visibility = View.VISIBLE
+                    binding.buttonAudio.visibility = View.GONE
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
 
         // Configuração do botão de envio de texto
         binding.buttonSend.setOnClickListener {
@@ -123,8 +146,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startTimer() {
-        binding.editTextMessage.visibility = android.view.View.GONE // Oculta o campo de entrada de texto
-        binding.textViewTimer.visibility = android.view.View.VISIBLE // Mostra o contador de gravação
+        binding.editTextMessage.visibility = View.GONE // Oculta o campo de entrada de texto
+        binding.textViewTimer.visibility = View.VISIBLE // Mostra o contador de gravação
         startTime = System.currentTimeMillis()
 
         timerHandler = Handler(Looper.getMainLooper())
@@ -140,10 +163,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun stopTimer() {
         timerHandler?.removeCallbacks(timerRunnable!!)
-        binding.textViewTimer.visibility = android.view.View.GONE // Oculta o contador de gravação
-        binding.editTextMessage.visibility = android.view.View.VISIBLE // Mostra o campo de entrada de texto novamente
+        binding.textViewTimer.visibility = View.GONE // Oculta o contador de gravação
+        binding.editTextMessage.visibility = View.VISIBLE // Mostra o campo de entrada de texto novamente
     }
-
 
     private fun sendMessage(message: String) {
         // Adiciona a mensagem do usuário imediatamente
@@ -222,9 +244,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        speechRecognizer.destroy()  // Liberar recursos do SpeechRecognizer
-        stopThinkingIndicator()     // Liberar o Handler de "pensando"
-        stopTimer()                 // Liberar o temporizador
+        speechRecognizer.destroy() // Libera o SpeechRecognizer
     }
 }
 
