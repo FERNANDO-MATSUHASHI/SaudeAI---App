@@ -2,12 +2,21 @@ package com.admmaster.saudeai
 
 import ChatAdapter
 import ChatMessage
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.speech.RecognitionListener
+import android.speech.RecognizerIntent
+import android.speech.SpeechRecognizer
 import android.text.TextUtils
+import android.view.MotionEvent
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.admmaster.saudeai.databinding.ActivityMainBinding
 import com.google.gson.annotations.SerializedName
@@ -24,6 +33,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var chatAdapter: ChatAdapter
     private var sessionId: String? = null
+    private lateinit var speechRecognizer: SpeechRecognizer
+    private val REQUEST_RECORD_AUDIO_PERMISSION = 1
+
+    // Variáveis para o temporizador
+    private var timerHandler: Handler? = null
+    private var timerRunnable: Runnable? = null
+    private var startTime: Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +54,7 @@ class MainActivity : AppCompatActivity() {
             adapter = chatAdapter
         }
 
+        // Configuração do botão de envio de texto
         binding.buttonSend.setOnClickListener {
             val message = binding.editTextMessage.text.toString().trim()
             if (!TextUtils.isEmpty(message)) {
@@ -45,7 +62,88 @@ class MainActivity : AppCompatActivity() {
                 binding.editTextMessage.text.clear() // Limpa o campo de entrada após enviar
             }
         }
+
+        // Configuração do botão de áudio com temporizador
+        binding.buttonAudio.setOnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    checkAudioPermissionAndStartListening()
+                    startTimer() // Inicia o temporizador
+                    true
+                }
+                MotionEvent.ACTION_UP -> {
+                    speechRecognizer.stopListening() // Para o reconhecimento ao soltar o botão
+                    stopTimer() // Para o temporizador
+                    true
+                }
+                else -> false
+            }
+        }
+
+        // Inicialização do SpeechRecognizer
+        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
+        speechRecognizer.setRecognitionListener(object : RecognitionListener {
+            override fun onResults(results: Bundle?) {
+                val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                matches?.let {
+                    val recognizedText = it[0]  // Pega o primeiro resultado de reconhecimento
+                    sendMessage(recognizedText)  // Envia como mensagem de texto
+                }
+            }
+
+            override fun onError(error: Int) {
+                Toast.makeText(this@MainActivity, "Erro no reconhecimento de áudio", Toast.LENGTH_SHORT).show()
+            }
+
+            // Outros métodos vazios do RecognitionListener que não precisam ser implementados
+            override fun onReadyForSpeech(params: Bundle?) {}
+            override fun onBeginningOfSpeech() {}
+            override fun onRmsChanged(rmsdB: Float) {}
+            override fun onBufferReceived(buffer: ByteArray?) {}
+            override fun onEndOfSpeech() {}
+            override fun onPartialResults(partialResults: Bundle?) {}
+            override fun onEvent(eventType: Int, params: Bundle?) {}
+        })
     }
+
+    private fun checkAudioPermissionAndStartListening() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+            startListening()
+        } else {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), REQUEST_RECORD_AUDIO_PERMISSION)
+        }
+    }
+
+    private fun startListening() {
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, "pt-BR")
+        }
+        speechRecognizer.startListening(intent)
+    }
+
+    private fun startTimer() {
+        binding.editTextMessage.visibility = android.view.View.GONE // Oculta o campo de entrada de texto
+        binding.textViewTimer.visibility = android.view.View.VISIBLE // Mostra o contador de gravação
+        startTime = System.currentTimeMillis()
+
+        timerHandler = Handler(Looper.getMainLooper())
+        timerRunnable = object : Runnable {
+            override fun run() {
+                val elapsedSeconds = (System.currentTimeMillis() - startTime) / 1000
+                binding.textViewTimer.text = "Gravando áudio... ${elapsedSeconds}s"
+                timerHandler?.postDelayed(this, 1000)
+            }
+        }
+        timerHandler?.post(timerRunnable!!)
+    }
+
+    private fun stopTimer() {
+        timerHandler?.removeCallbacks(timerRunnable!!)
+        binding.textViewTimer.visibility = android.view.View.GONE // Oculta o contador de gravação
+        binding.editTextMessage.visibility = android.view.View.VISIBLE // Mostra o campo de entrada de texto novamente
+    }
+
 
     private fun sendMessage(message: String) {
         // Adiciona a mensagem do usuário imediatamente
@@ -65,7 +163,6 @@ class MainActivity : AppCompatActivity() {
 
         chatService.sendMessage(request).enqueue(object : retrofit2.Callback<ChatResponse> {
             override fun onResponse(call: retrofit2.Call<ChatResponse>, response: retrofit2.Response<ChatResponse>) {
-
                 stopThinkingIndicator()
 
                 if (response.isSuccessful) {
@@ -77,16 +174,12 @@ class MainActivity : AppCompatActivity() {
                         binding.recyclerViewChat.scrollToPosition(chatAdapter.itemCount - 1)
                     }
                 } else {
-                    // Se a resposta não for bem-sucedida, você pode lidar com isso aqui
                     Toast.makeText(this@MainActivity, "Erro ao receber resposta", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: retrofit2.Call<ChatResponse>, t: Throwable) {
-
                 stopThinkingIndicator()
-
-                // Notifica erro na chamada
                 Toast.makeText(this@MainActivity, "Erro ao enviar mensagem", Toast.LENGTH_SHORT).show()
             }
         })
@@ -116,6 +209,23 @@ class MainActivity : AppCompatActivity() {
         thinkingRunnable = null
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_RECORD_AUDIO_PERMISSION) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startListening()
+            } else {
+                Toast.makeText(this, "Permissão de áudio negada", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        speechRecognizer.destroy()  // Liberar recursos do SpeechRecognizer
+        stopThinkingIndicator()     // Liberar o Handler de "pensando"
+        stopTimer()                 // Liberar o temporizador
+    }
 }
 
 data class ChatRequest(
@@ -134,7 +244,7 @@ interface ChatService {
     fun sendMessage(@Body request: ChatRequest): retrofit2.Call<ChatResponse>
 
     companion object {
-        private const val BASE_URL = "https://chatllama-tw11.onrender.com/"
+        private const val BASE_URL = "https://admmaster.com.br/"
 
         fun create(): ChatService {
             val client = OkHttpClient.Builder()
