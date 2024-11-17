@@ -1,10 +1,12 @@
 [versions]
-agp = "8.5.2"
+agp = "8.7.2"
 appcompatVersion = "1.4.0"
 constraintlayout = "2.1.4"
 converterGson = "2.9.0"
+core = "4.6.2"
+coreVersion = "4.2.0"
 gradle = "8.1.4"
-gradleVersion = "8.1.1"
+gradleVersion = "8.7.2"
 kotlin = "1.9.0"
 coreKtx = "1.13.1"
 junit = "4.13.2"
@@ -12,9 +14,12 @@ junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 kotlinGradlePlugin = "1.9.10"
 kotlinGradlePluginVersion = "1.9.0"
+kotlinMarkdown = "1.9.20"
+kotlinMarkdownVersion = "1.2.0"
 lifecycleRuntimeKtx = "2.8.6"
 activityCompose = "1.9.3"
 composeBom = "2024.04.01"
+markdown = "1.9.20"
 recyclerview = "1.3.2"
 retrofit = "2.9.0"
 appcompat = "1.7.0"
@@ -25,6 +30,8 @@ androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayo
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
+core = { module = "io.noties.markwon:core", version.ref = "core" }
+core-v420 = { module = "io.noties.markwon:core", version.ref = "coreVersion" }
 gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
 gradle-v811 = { module = "com.android.tools.build:gradle", version.ref = "gradleVersion" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -42,6 +49,9 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinGradlePlugin" }
 kotlin-gradle-plugin-v190 = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinGradlePluginVersion" }
+kotlin-markdown = { module = "com.github.epfl-lara:kotlin-markdown", version.ref = "kotlinMarkdown" }
+kotlin-markdown-v120 = { module = "com.github.epfl-lara:kotlin-markdown", version.ref = "kotlinMarkdownVersion" }
+markdown = { module = "vanniktech:markdown", version.ref = "markdown" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 

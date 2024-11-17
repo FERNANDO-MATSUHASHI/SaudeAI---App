@@ -11,4 +11,7 @@
     <color name="colorPrimary">#6200EE</color> <!-- Cor primária -->
     <color name="colorPrimaryDark">#3700B3</color> <!-- Cor primária escura -->
     <color name="colorAccent">#03DAC5</color> <!-- Cor de destaque -->
+    <color name="codeBlockColor">#FFCC80</color> <!-- Cor para blocos de código -->
+    <color name="headerColor">#42A5F5</color>     <!-- Cor para cabeçalhos -->
+    <color name="codeBackgroundColor">#F0F0F0</color>
 </resources>

@@ -3,6 +3,7 @@ package com.admmaster.saudeai
 import ChatAdapter
 import ChatMessage
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -44,6 +45,7 @@ class MainActivity : AppCompatActivity() {
     private var timerRunnable: Runnable? = null
     private var startTime: Long = 0
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -189,9 +191,13 @@ class MainActivity : AppCompatActivity() {
 
                 if (response.isSuccessful) {
                     response.body()?.let {
+                        // Remove os ** da resposta do bot
+                        val formattedResponse = it.resposta.replace(Regex("\\*\\*(.*?)\\*\\*"), "$1")
+
+
                         // Remove a última mensagem (pensando) antes de adicionar a resposta do bot
                         chatAdapter.removeLastMessage() // Método para remover a última mensagem
-                        chatAdapter.addMessage(ChatMessage(it.resposta, false)) // Adiciona a resposta do bot
+                        chatAdapter.addMessage(ChatMessage(formattedResponse, false)) // Adiciona a resposta do bot
                         sessionId = it.session_id
                         binding.recyclerViewChat.scrollToPosition(chatAdapter.itemCount - 1)
                     }

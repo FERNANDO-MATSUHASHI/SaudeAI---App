@@ -81,4 +81,6 @@ dependencies {
 
     implementation(libs.androidx.appcompat.v140)
 
+    implementation(libs.core)
+
 }
